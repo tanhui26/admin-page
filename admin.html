@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>管理面板</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        h1 { color: #333; }
+        .info {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        code {
+            background: #f4f4f4;
+            padding: 10px;
+            display: block;
+            word-break: break-all;
+        }
+        button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>代理管理面板</h1>
+        <div class="info">
+            <h3>配置信息</h3>
+            <p>UUID: <code id="uuid">加载中...</code></p>
+            <p>配置链接: <code id="configLink">加载中...</code></p>
+        </div>
+        <button onclick="logout()">退出登录</button>
+    </div>
+    <script>
+        async function getConfig() {
+            const res = await fetch('/config.json');
+            const data = await res.json();
+            document.getElementById('uuid').innerText = data.UUID;
+            document.getElementById('configLink').innerHTML = location.protocol + '//' + location.host + '/' + data.UUID;
+        }
+        getConfig();
+        
+        function logout() {
+            document.cookie = 'auth=; path=/; max-age=0';
+            window.location.href = '/login';
+        }
+    </script>
+</body>
+</html>
