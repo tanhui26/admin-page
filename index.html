@@ -1,11 +1,731 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>网站建设中</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>家庭影院 | 极速聚合·不断片</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0c15 0%, #07090f 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: #f0f3fa;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 1.8rem;
+            padding-top: 0.5rem;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #c084fc, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .sub-notice {
+            font-size: 0.75rem;
+            color: #6c86a3;
+            margin-top: 0.5rem;
+            border-top: 1px dashed #2d3a5e;
+            display: inline-block;
+            padding-top: 0.5rem;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .player-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .player-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .player-info {
+            padding: 0 0.25rem;
+        }
+
+        .player-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 0.4rem;
+            color: #ffffff;
+            word-break: break-word;
+        }
+
+        .episode-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            padding: 1rem 0.25rem;
+            max-height: 260px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 1rem;
+            margin-top: 0.75rem;
+        }
+
+        .episode-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 0.5rem 1.2rem;
+            border-radius: 2rem;
+            color: #cbd5e6;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .episode-btn:hover {
+            background: #334155;
+            transform: translateY(-1px);
+        }
+
+        .episode-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 0 6px rgba(59,130,246,0.6);
+        }
+
+        .search-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-group input {
+            flex: 1;
+            min-width: 200px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            padding: 0.85rem 1.3rem;
+            border-radius: 3rem;
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .search-group input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.3);
+        }
+
+        .btn {
+            border: none;
+            padding: 0.8rem 1.6rem;
+            border-radius: 3rem;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+        }
+
+        .btn-search {
+            background: linear-gradient(95deg, #3b82f6, #8b5cf6);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+
+        .btn-search:hover {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
+
+        .btn-settings {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid #4b5563;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .result-card {
+            background: #1e293b;
+            border-radius: 1rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border: 1px solid #2d3a5e;
+        }
+
+        .result-card:hover {
+            transform: translateY(-6px);
+            border-color: #3b82f6;
+            box-shadow: 0 15px 25px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-cover {
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            object-fit: cover;
+            background: #0f172a;
+            display: block;
+        }
+
+        .result-info {
+            padding: 0.7rem;
+        }
+
+        .result-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .result-source {
+            font-size: 0.7rem;
+            color: #60a5fa;
+            margin-top: 0.25rem;
+        }
+
+        .source-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin: 1rem 0;
+            max-height: 180px;
+            overflow-y: auto;
+            padding: 0.2rem;
+        }
+
+        .source-tag {
+            background: #1e293b;
+            padding: 0.45rem 0.9rem;
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .del-btn {
+            background: none;
+            border: none;
+            color: #f87171;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 22px;
+            height: 22px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 30px;
+        }
+
+        .del-btn:hover {
+            background: #7f1a1a;
+            color: white;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .add-form input {
+            flex: 1;
+            background: #020617;
+            border: 1px solid #334155;
+            padding: 0.7rem 1rem;
+            border-radius: 2rem;
+            color: white;
+        }
+
+        .close-player-btn {
+            position: absolute;
+            top: 0.9rem;
+            right: 0.9rem;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .close-player-btn:hover {
+            background: #ef4444;
+            transform: rotate(90deg);
+        }
+
+        #statusArea {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+            padding-left: 0.3rem;
+        }
+
+        @media (max-width: 640px) {
+            .results-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 0.8rem;
+            }
+            .btn {
+                padding: 0.65rem 1.2rem;
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+            margin-right: 6px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .retry-note {
+            font-size: 0.7rem;
+            color: #facc15;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h1>网站正在建设中...</h1>
-    <p>请稍后访问</p>
+<div class="container">
+    <div class="hero">
+        <h1>🎬 家庭影院 · 极速聚合</h1>
+        <div class="sub-notice">智能多源搜索 · 永不中断 · 仅供体验</div>
+    </div>
+
+    <div class="card hidden" id="playerCard">
+        <button class="close-player-btn" id="closePlayerBtn">✕</button>
+        <div class="player-container">
+            <iframe id="videoFrame" src="" allowfullscreen></iframe>
+        </div>
+        <div class="player-info">
+            <div class="player-title" id="playerTitle">—</div>
+            <div style="font-size:0.8rem; color:#94a3b8; margin-bottom:0.25rem" id="playerSource"></div>
+            <div class="episode-list" id="episodeList"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="search-group">
+            <input type="text" id="searchKeyword" placeholder="输入电影/电视剧名，例如：热辣滚烫、庆余年" autocomplete="off">
+            <button class="btn btn-search" id="searchBtn">🔍 极速搜索</button>
+            <button class="btn btn-settings" id="settingsBtn">⚙️ 资源源管理</button>
+        </div>
+        <div id="statusArea"></div>
+        <div id="resultsContainer" class="results-grid"></div>
+        <div id="retryNote" class="retry-note"></div>
+    </div>
+
+    <div class="card hidden" id="settingsCard">
+        <h3>📡 自定义影视源</h3>
+        <div id="sourceList" class="source-list">加载中...</div>
+        <div class="add-form">
+            <input type="text" id="newSourceName" placeholder="源名称 (如: 极速资源)">
+            <input type="text" id="newSourceApi" placeholder="API地址 (如: https://xxx.com/api.php/provide/vod)">
+            <button class="btn btn-search" id="addSourceBtn">➕ 添加</button>
+            <button class="btn btn-settings" id="resetBtn" style="background:#b91c1c;">🔄 重置默认</button>
+        </div>
+        <p style="font-size: 0.7rem; margin-top: 10px; color:#6c86a3;">💡 注意：接口需支持 ?ac=detail&wd=关键词 返回标准JSON</p>
+    </div>
+</div>
+
+<script>
+    // ========== 终极优化版：永不中断的多源聚合 ==========
+    
+    // 代理列表（按稳定性排序，allorigins 最稳，corsproxy.io 备用，cors-anywhere 兜底）
+    const CORS_PROXIES = [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?',
+        'https://cors-anywhere.herokuapp.com/'
+    ];
+    
+    // 超时时间 20 秒，给予足够响应时间
+    const REQUEST_TIMEOUT_MS = 20000;
+    
+    // 默认影视源（涵盖多个稳定源）
+    const DEFAULT_SOURCES = [
+      { name: "⚡ 如意资源", api: "https://cj.rycjapi.com/api.php/provide/vod" },
+      { name: "🌪️ 暴风资源", api: "https://bfzyapi.com/api.php/provide/vod" },
+      { name: "🕊️ 天涯资源", api: "https://tyyszy.com/api.php/provide/vod" },
+      { name: "🚀 非凡影视", api: "http://ffzy5.tv/api.php/provide/vod" },
+      { name: "🌐 360资源", api: "https://360zy.com/api.php/provide/vod" }, 
+      { name: "🥡 iqiyi资源", api: "https://www.iqiyizyapi.com/api.php/provide/vod" }, 
+      { name: "🐉 卧龙资源", api: "https://wolongzyw.com/api.php/provide/vod" },
+      { name: "⏱️ 极速资源", api: "https://jszyapi.com/api.php/provide/vod" },
+      { name: "🌸 豆瓣资源", api: "https://dbzy.tv/api.php/provide/vod" }, 
+      { name: "🌆 魔都资源", api: "https://www.mdzyapi.com/api.php/provide/vod" }, 
+      { name: "📦 最大资源", api: "https://api.zuidapi.com/api.php/provide/vod" },
+      { name: "8K影视", api: "https://www.8kvod.com/api.php/provide/vod" },
+      { name: "飞速资源", api: "https://www.feisuzyapi.com/api.php/provide/vod" },
+      { name: "量子资源", api: "https://cj.lziapi.com/api.php/provide/vod" },
+      { name: "红牛资源", api: "https://www.hongniuzy.com/api.php/provide/vod" },
+      { name: "光速资源", api: "https://api.guangsuapi.com/api.php/provide/vod" },
+      { name: "快车资源", api: "https://caiji.kczyapi.com/api.php/provide/vod" },
+      { name: "无尽资源", api: "https://api.wujinapi.me/api.php/provide/vod" }
+    ];
+
+    // 获取源列表（localStorage 持久化）
+    function getSources() {
+        try {
+            const stored = localStorage.getItem("movie_sources");
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+            }
+        } catch(e) {}
+        return [...DEFAULT_SOURCES];
+    }
+
+    function saveSources(sources) {
+        localStorage.setItem("movie_sources", JSON.stringify(sources));
+    }
+
+    function resetToDefaultSources() {
+        saveSources([...DEFAULT_SOURCES]);
+        loadSourcesUI();
+        alert('✅ 已恢复默认源列表');
+    }
+
+    function addSource(name, api) {
+        const sources = getSources();
+        if (sources.some(s => s.name === name)) throw new Error("名称已存在");
+        sources.push({ name, api });
+        saveSources(sources);
+    }
+
+    function deleteSource(name) {
+        const sources = getSources();
+        saveSources(sources.filter(s => s.name !== name));
+    }
+
+    function parsePlay(raw) {
+        if (!raw) return [];
+        const eps = [];
+        String(raw).split("$$$").forEach(line => {
+            line.split("#").forEach(part => {
+                const arr = part.split("$");
+                if (arr.length >= 2 && arr[1]) eps.push({ name: arr[0] || "播放", url: arr[1] });
+            });
+        });
+        return eps;
+    }
+
+    // 核心：带代理重试的请求函数（自动切换代理，永不放弃）
+    async function fetchViaProxy(targetUrl, retryIndex = 0) {
+        if (retryIndex >= CORS_PROXIES.length) {
+            throw new Error('所有代理均尝试失败');
+        }
+        
+        const proxy = CORS_PROXIES[retryIndex];
+        const proxyUrl = proxy + encodeURIComponent(targetUrl);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+        
+        try {
+            const resp = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            
+            const text = await resp.text();
+            const trimmed = text.trim();
+            
+            // 验证是否为有效 JSON
+            if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+                console.warn(`代理 ${proxy} 返回非JSON，切换下一个`);
+                return fetchViaProxy(targetUrl, retryIndex + 1);
+            }
+            
+            return JSON.parse(trimmed);
+        } catch (err) {
+            clearTimeout(timeoutId);
+            console.warn(`代理 ${proxy} 失败 (${err.message})，切换下一个`);
+            return fetchViaProxy(targetUrl, retryIndex + 1);
+        }
+    }
+
+    // 搜索单个源（自带重试，永不中断）
+    async function searchFromSource(source, keyword) {
+        const targetUrl = source.api + "?ac=detail&wd=" + encodeURIComponent(keyword);
+        try {
+            const data = await fetchViaProxy(targetUrl, 0);
+            const results = [];
+            if (data?.list && Array.isArray(data.list)) {
+                data.list.forEach(m => {
+                    results.push({
+                        title: m.vod_name,
+                        cover: m.vod_pic,
+                        sourceName: source.name,
+                        episodes: parsePlay(m.vod_play_url)
+                    });
+                });
+            }
+            return results;
+        } catch (finalError) {
+            console.warn(`源 ${source.name} 最终不可用:`, finalError.message);
+            return [];  // 静默失败，不影响其他源
+        }
+    }
+
+    // 主搜索函数（并发+去重+流畅提示）
+    async function performSearch() {
+        const keyword = document.getElementById('searchKeyword').value.trim();
+        if (!keyword) {
+            alert('请输入影片名称');
+            return;
+        }
+        
+        const statusDiv = document.getElementById('statusArea');
+        const resultsDiv = document.getElementById('resultsContainer');
+        const retryNoteDiv = document.getElementById('retryNote');
+        retryNoteDiv.innerHTML = '';
+        
+        statusDiv.innerHTML = '<span class="loading"></span> 正在全网极速搜索 · 多代理并行保障 (最长30秒)';
+        resultsDiv.innerHTML = '<div style="text-align:center; grid-column:1/-1; padding:2rem;">⏳ 智能聚合中，请稍候...</div>';
+        
+        const sources = getSources();
+        const allResults = [];
+        
+        // 顺序执行（避免代理限流），但每个源内部自动重试所有代理，确保不断片
+        for (let i = 0; i < sources.length; i++) {
+            const src = sources[i];
+            statusDiv.innerHTML = `<span class="loading"></span> 正在搜索 (${i+1}/${sources.length}): ${src.name} ... 使用智能代理`;
+            const results = await searchFromSource(src, keyword);
+            allResults.push(...results);
+            // 避免请求过快
+            if (i < sources.length - 1) await new Promise(r => setTimeout(r, 200));
+        }
+        
+        if (allResults.length === 0) {
+            statusDiv.textContent = '😞 未找到相关影视，请尝试其他关键词或点击「重置默认」更新源列表。';
+            resultsDiv.innerHTML = '';
+            retryNoteDiv.innerHTML = '💡 提示：某些源可能暂时失效，重置默认源后可继续使用。';
+            return;
+        }
+        
+        statusDiv.textContent = `✨ 共找到 ${allResults.length} 条结果，点击卡片即可播放`;
+        resultsDiv.innerHTML = '';
+        
+        // 去重（标题+来源）
+        const uniqueMap = new Map();
+        for (const item of allResults) {
+            const key = `${item.title}|${item.sourceName}`;
+            if (!uniqueMap.has(key)) uniqueMap.set(key, item);
+        }
+        const uniqueResults = Array.from(uniqueMap.values());
+        
+        if (uniqueResults.length < allResults.length) {
+            retryNoteDiv.innerHTML = `🔍 去重后共 ${uniqueResults.length} 部独立影片`;
+        }
+        
+        uniqueResults.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'result-card';
+            const coverImg = document.createElement('img');
+            coverImg.className = 'result-cover';
+            let poster = item.cover || '';
+            if (!poster || poster === '') poster = 'https://placehold.co/200x300?text=暂无海报';
+            coverImg.src = poster;
+            coverImg.onerror = () => { coverImg.src = 'https://placehold.co/200x300?text=封面缺失'; };
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'result-info';
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'result-title';
+            titleDiv.textContent = item.title || '未知片名';
+            const sourceDiv = document.createElement('div');
+            sourceDiv.className = 'result-source';
+            sourceDiv.textContent = `📀 ${item.sourceName || '第三方'}`;
+            infoDiv.appendChild(titleDiv);
+            infoDiv.appendChild(sourceDiv);
+            card.appendChild(coverImg);
+            card.appendChild(infoDiv);
+            
+            card.onclick = () => {
+                if (item.episodes?.length) {
+                    playVideo(item.episodes[0].url, item.title, item.sourceName, item.episodes, 0);
+                } else {
+                    alert('该资源暂无播放链接');
+                }
+            };
+            resultsDiv.appendChild(card);
+        });
+    }
+
+    let currentEpisodes = [];
+    
+    function playVideo(url, title, source, episodes, targetIndex) {
+        if (!url) {
+            alert('播放链接无效');
+            return;
+        }
+        const playerCard = document.getElementById('playerCard');
+        playerCard.classList.remove('hidden');
+        document.getElementById('videoFrame').src = url;
+        document.getElementById('playerTitle').textContent = `${title} · ${episodes[targetIndex]?.name || '正片'}`;
+        document.getElementById('playerSource').textContent = `🎞️ 来源：${source}`;
+        
+        const container = document.getElementById('episodeList');
+        container.innerHTML = '';
+        episodes.forEach((ep, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'episode-btn' + (idx === targetIndex ? ' active' : '');
+            btn.textContent = ep.name.length > 18 ? ep.name.slice(0,16)+'..' : ep.name;
+            btn.onclick = () => playVideo(ep.url, title, source, episodes, idx);
+            container.appendChild(btn);
+        });
+        document.getElementById('playerCard').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function closePlayer() {
+        document.getElementById('videoFrame').src = 'about:blank';
+        document.getElementById('playerCard').classList.add('hidden');
+        document.getElementById('episodeList').innerHTML = '';
+    }
+    
+    function loadSourcesUI() {
+        const container = document.getElementById('sourceList');
+        const sources = getSources();
+        container.innerHTML = '';
+        sources.forEach(src => {
+            const tag = document.createElement('div');
+            tag.className = 'source-tag';
+            tag.innerHTML = `<span>${escapeHtml(src.name)}</span>`;
+            const delBtn = document.createElement('button');
+            delBtn.className = 'del-btn';
+            delBtn.textContent = '✕';
+            delBtn.onclick = () => {
+                if (confirm(`删除源“${src.name}”？`)) {
+                    deleteSource(src.name);
+                    loadSourcesUI();
+                }
+            };
+            tag.appendChild(delBtn);
+            container.appendChild(tag);
+        });
+        if (!sources.length) container.innerHTML = '<span style="color:#94a3b8;">暂无源，请添加或重置默认</span>';
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m] || m));
+    }
+    
+    function handleAddSource() {
+        const name = document.getElementById('newSourceName').value.trim();
+        const api = document.getElementById('newSourceApi').value.trim();
+        if (!name || !api) return alert('请填写完整');
+        if (!api.startsWith('http')) return alert('API地址需以 http:// 或 https:// 开头');
+        try {
+            addSource(name, api);
+            document.getElementById('newSourceName').value = '';
+            document.getElementById('newSourceApi').value = '';
+            loadSourcesUI();
+            alert('✅ 添加成功');
+        } catch(e) { alert(e.message); }
+    }
+    
+    document.getElementById('searchBtn').addEventListener('click', performSearch);
+    document.getElementById('settingsBtn').addEventListener('click', () => {
+        document.getElementById('settingsCard').classList.toggle('hidden');
+    });
+    document.getElementById('addSourceBtn').addEventListener('click', handleAddSource);
+    document.getElementById('resetBtn').addEventListener('click', () => {
+        if (confirm('重置所有源？')) resetToDefaultSources();
+    });
+    document.getElementById('closePlayerBtn').addEventListener('click', closePlayer);
+    document.getElementById('searchKeyword').addEventListener('keypress', e => {
+        if (e.key === 'Enter') performSearch();
+    });
+    
+    loadSourcesUI();
+    console.log('家庭影院 · 永不中断版已启动 | 多代理容灾 | 超时20秒');
+</script>
 </body>
 </html>
+
+
+
+// ================
+// <!DOCTYPE html>
+// <html>
+// <head>
+  //   <title>网站建设中</title>
+ //    <meta charset="UTF-8">
+// </head>
+// <body>
+//     <h1>网站正在建设中...</h1>
+//     <p>请稍后访问</p>
+// </body>
+// </html>
